@@ -8,17 +8,24 @@ public class CSC245_Project2 {
         // Read the filename from the command line argument
         String filename = args[0];
         BufferedReader inputStream = null;
-
+        /*
+         * filename is not sanitized
+         */
         String fileLine;
         try {
             try {
+                /*
+                 * Shouldn't this be in its own try/catch?
+                 */
                 inputStream = new BufferedReader(new FileReader(filename));
 
                 System.out.println("Email Addresses:");
-                inputStream = new BufferedReader(new FileReader(filename));
 
-                System.out.println("Email Addresses:");
                 // Read one Line using BufferedReader
+
+                /*
+                 * I feel like there should be more checks here...
+                 */
                 while ((fileLine = inputStream.readLine()) != null) {
                     System.out.println(fileLine);
                 }
