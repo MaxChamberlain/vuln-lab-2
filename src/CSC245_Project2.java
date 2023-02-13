@@ -11,27 +11,34 @@ public class CSC245_Project2 {
 
         String fileLine;
         try {
-            inputStream = new BufferedReader(new FileReader(filename));
-
-            System.out.println("Email Addresses:");
-            // Read one Line using BufferedReader
-            while ((fileLine = inputStream.readLine()) != null) {
-                System.out.println(fileLine);
-            }
-        } catch (IOException io) {
-            System.out.println("File IO exception" + io.getMessage());
-        } finally {
-            // Need another catch for closing
-            // the streams
             try {
-                if (inputStream != null) {
-                    inputStream.close();
+                inputStream = new BufferedReader(new FileReader(filename));
+
+                System.out.println("Email Addresses:");
+                inputStream = new BufferedReader(new FileReader(filename));
+
+                System.out.println("Email Addresses:");
+                // Read one Line using BufferedReader
+                while ((fileLine = inputStream.readLine()) != null) {
+                    System.out.println(fileLine);
                 }
             } catch (IOException io) {
-                System.out.println("Issue closing the Files" + io.getMessage());
+                System.out.println("File IO exception" + io.getMessage());
+            } finally {
+                // Need another catch for closing
+                // the streams
+                try {
+                    if (inputStream != null) {
+                        inputStream.close();
+                    }
+                } catch (IOException io) {
+                    System.out.println("Issue closing the Files" + io.getMessage());
+                }
+
             }
-
+        } catch (Error e) {
+            System.out.println(e);
         }
-    }
 
+    }
 }
