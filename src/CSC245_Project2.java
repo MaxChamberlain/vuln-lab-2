@@ -4,6 +4,21 @@ import java.io.IOException;
 
 public class CSC245_Project2 {
 
+    /*  DISCOVERED VULNERABILITIES
+     * 1. Does not check email address for script tags
+     *
+     * 2. Does not check email address for unescaped "illegal" characters
+     *      ( # ! = @ % $ . )
+     *
+     * 3. Does not check validity of domain carrier
+     *      (.com => .comnfg)
+     *
+     * 4. Does not check validity of domain host
+     *      (@arapahoe.edu => @..edu)
+     *
+     * 5. Does not check length of Email name (ed@...)
+     */
+
     public static void main(String[] args) {
         // Read the filename from the command line argument
         String filename = args[0];
