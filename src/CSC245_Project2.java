@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.regex.Matcher;
@@ -59,25 +60,39 @@ public class CSC245_Project2 {
         //Validate Target Directory (assets)
         String currentDirectory = System.getProperty("user.dir");
         String assetsFolderPath = currentDirectory + File.separator + "assets";
-        if (!canonicalFilename.startsWith(assetsFolderPath)) throw new IllegalArgumentException("Provided path outside of assets folder");
+        if (!normalizedFilename.startsWith(assetsFolderPath)) throw new IllegalArgumentException("Provided path outside of assets folder");
+
+        // Check if file is too large
+        if (isFileTooLarge(normalizedFilename)) throw new IllegalArgumentException("File too large");
 
         String fileLine;
         // WHY ARE THERE TWO TRY/CATCH BLOCKS? I removed one but why was it there in the first place?
-        try (BufferedReader inputStream = new BufferedReader(new FileReader(canonicalFilename))) {   // try-with-resources
+        try (BufferedReader inputStream = new BufferedReader(new FileReader(normalizedFilename))) {   // try-with-resources
             System.out.println("Email Addresses:");
             // Regex for email address
             Pattern emailRegex = Pattern.compile("^[a-zA-Z0-9_.+-]{3,}@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]{2,}$");
             while ((fileLine = inputStream.readLine()) != null) {
-                //normalize file line to prevent unicode attacks
-                String normalizedFileLine = Normalizer.normalize(fileLine, Form.NFKC);
-                if (emailRegex.matcher(normalizedFileLine).matches()) {
-                    System.out.println(normalizedFileLine);
-                } else {
-                    System.out.println("Invalid Email Address: " + normalizedFileLine);
+                try{
+                    //normalize file line to prevent unicode attacks
+                    String normalizedFileLine = Normalizer.normalize(fileLine, Form.NFKC);
+                    if (emailRegex.matcher(normalizedFileLine).matches()) {
+                        System.out.println(normalizedFileLine);
+                    } else {
+                        throw new IllegalArgumentException("Invalid Email Address (" + normalizedFileLine + ")");
+                    }
+                } catch(IllegalArgumentException e){
+                    System.out.println(e);
                 }
             }
         } catch (IOException io) {
             System.out.println("File IO exception: " + io.getMessage());
         }
+    }
+
+    // Check if the file size is too large
+    private static boolean isFileTooLarge(String filename) throws IOException {
+        long fileSize = Paths.get(filename).toFile().length();
+        long maxFileSize = 1000000; // 1 MB
+        return fileSize > maxFileSize;
     }
 }
