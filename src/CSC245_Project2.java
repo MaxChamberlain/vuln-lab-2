@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -33,19 +34,28 @@ public class CSC245_Project2 {
      *          solved by using try-with-resources instead of try-catch-finally
      */
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         // Check for filename
-        String filename = args[0];
-        if (filename == null || filename.isEmpty()) throw new IllegalArgumentException("No filename");
-        String regex = "^[a-zA-Z0-9_]+\\.[a-zA-Z]+$"; // Regex for valid characters
+        String filename = "./assets/" + args[0];
+        String canonicalFilename = new File(filename).getCanonicalPath();
+        if(!canonicalFilename.endsWith(".txt")) throw new IllegalArgumentException("Invalid File Type");
+        if (canonicalFilename == null || canonicalFilename.isEmpty()) throw new IllegalArgumentException("No filename");
+        String regex = "^[a-zA-Z0-9_\\./:]+.txt$"; // Regex for valid characters
         Pattern filenameRegex = Pattern.compile(regex);
-        Matcher filenameMatcher = filenameRegex.matcher(filename);
-        if(!filenameMatcher.matches()) throw new IllegalArgumentException("Invalid filename");
+        Matcher filenameMatcher = filenameRegex.matcher(canonicalFilename);
+        boolean matches = filenameMatcher.matches();
+
+        if(matches) throw new IllegalArgumentException("Invalid filename");
+
+        String currentDirectory = System.getProperty("user.dir");
+        String assetsFolderPath = currentDirectory + File.separator + "assets";
+        if (!canonicalFilename.startsWith(assetsFolderPath)) throw new IllegalArgumentException("Provided path outside of assets folder");
+
 
         String fileLine;
         // WHY ARE THERE TWO TRY/CATCH BLOCKS? I removed one but why was it there in the first place?
-        try (BufferedReader inputStream = new BufferedReader(new FileReader(filename))) {   // try-with-resources
+        try (BufferedReader inputStream = new BufferedReader(new FileReader(canonicalFilename))) {   // try-with-resources
             System.out.println("Email Addresses:");
             // Regex for email address
             Pattern emailRegex = Pattern.compile("^[a-zA-Z0-9_.+-]{3,}@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]{2,}$");
@@ -57,7 +67,7 @@ public class CSC245_Project2 {
                 }
             }
         } catch (IOException io) {
-            System.out.println("File IO exception" + io.getMessage());
+            System.out.println("File IO exception: " + io.getMessage());
         }
     }
 }
