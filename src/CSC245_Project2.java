@@ -39,24 +39,18 @@ public class CSC245_Project2 {
         String filename = args[0];
         if (filename == null || filename.isEmpty()) throw new IllegalArgumentException("No filename");
         String regex = "^[a-zA-Z0-9_]+\\.[a-zA-Z]+$"; // Regex for valid characters
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(filename);
-        if(!matcher.matches()) throw new IllegalArgumentException("Invalid filename");
+        Pattern filenameRegex = Pattern.compile(regex);
+        Matcher filenameMatcher = filenameRegex.matcher(filename);
+        if(!filenameMatcher.matches()) throw new IllegalArgumentException("Invalid filename");
 
         String fileLine;
         // WHY ARE THERE TWO TRY/CATCH BLOCKS? I removed one but why was it there in the first place?
         try (BufferedReader inputStream = new BufferedReader(new FileReader(filename))) {   // try-with-resources
             System.out.println("Email Addresses:");
+            // Regex for email address
+            Pattern emailRegex = Pattern.compile("^[a-zA-Z0-9_.+-]{3,}@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]{2,}$");
             while ((fileLine = inputStream.readLine()) != null) {
-                boolean valid = false;
-                // Regex for email address
-                regex = "^[a-zA-Z0-9_.+-]{3,}@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]{2,}$";
-                pattern = Pattern.compile(regex);
-                matcher = pattern.matcher(fileLine);
-                if (matcher.matches()) {
-                    valid = true;
-                }
-                if (valid) {
+                if (emailRegex.matcher(fileLine).matches()) {
                     System.out.println(fileLine);
                 } else {
                     System.out.println("Invalid Email Address: " + fileLine);
