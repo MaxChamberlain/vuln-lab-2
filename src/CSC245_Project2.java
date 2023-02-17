@@ -2,6 +2,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,21 +39,27 @@ public class CSC245_Project2 {
     public static void main(String[] args) throws IOException {
 
         // Check for filename
-        String filename = "./assets/" + args[0];
-        String canonicalFilename = new File(filename).getCanonicalPath();
-        if(!canonicalFilename.endsWith(".txt")) throw new IllegalArgumentException("Invalid File Type");
-        if (canonicalFilename == null || canonicalFilename.isEmpty()) throw new IllegalArgumentException("No filename");
-        String regex = "^[a-zA-Z0-9_\\./:]+.txt$"; // Regex for valid characters
-        Pattern filenameRegex = Pattern.compile(regex);
-        Matcher filenameMatcher = filenameRegex.matcher(canonicalFilename);
-        boolean matches = filenameMatcher.matches();
+        String filename = "./assets/Email_addresses_20210205.txt";// + args[0];
+        if (filename == null || filename.isEmpty()) throw new IllegalArgumentException("No filename");
 
+        String canonicalFilename = new File(filename).getCanonicalPath();
+
+        //Normalize the filename to prevent unicode attacks
+        String normalizedFilename = Normalizer.normalize(canonicalFilename, Form.NFKC);
+        
+        if(!normalizedFilename.endsWith(".txt")) throw new IllegalArgumentException("Invalid File Type");
+
+        //Validate filename
+        String filenameRegex = "^[a-zA-Z0-9_\\./:]+.txt$"; // Regex for valid characters
+        Pattern filenamePattern = Pattern.compile(filenameRegex);
+        Matcher filenameMatcher = filenamePattern.matcher(normalizedFilename);
+        boolean matches = filenameMatcher.matches();
         if(matches) throw new IllegalArgumentException("Invalid filename");
 
+        //Validate Target Directory (assets)
         String currentDirectory = System.getProperty("user.dir");
         String assetsFolderPath = currentDirectory + File.separator + "assets";
         if (!canonicalFilename.startsWith(assetsFolderPath)) throw new IllegalArgumentException("Provided path outside of assets folder");
-
 
         String fileLine;
         // WHY ARE THERE TWO TRY/CATCH BLOCKS? I removed one but why was it there in the first place?
@@ -60,10 +68,12 @@ public class CSC245_Project2 {
             // Regex for email address
             Pattern emailRegex = Pattern.compile("^[a-zA-Z0-9_.+-]{3,}@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]{2,}$");
             while ((fileLine = inputStream.readLine()) != null) {
-                if (emailRegex.matcher(fileLine).matches()) {
-                    System.out.println(fileLine);
+                //normalize file line to prevent unicode attacks
+                String normalizedFileLine = Normalizer.normalize(fileLine, Form.NFKC);
+                if (emailRegex.matcher(normalizedFileLine).matches()) {
+                    System.out.println(normalizedFileLine);
                 } else {
-                    System.out.println("Invalid Email Address: " + fileLine);
+                    System.out.println("Invalid Email Address: " + normalizedFileLine);
                 }
             }
         } catch (IOException io) {
