@@ -1,6 +1,8 @@
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -34,9 +36,10 @@ public class Tests {
 		});
 	}
 	RegexTest[] filenames = new RegexTest[] {
-			  new RegexTest("Email_addresses_20210205.txt", true),
-			  new RegexTest("localemails.txt", true),
-			  new RegexTest("all_emails.csv", true),
+			  new RegexTest("assets/Email_addresses_20210205.txt", true),
+			  new RegexTest("assets/localemails.txt", true),
+			  new RegexTest("assets/../../.ssh/id_rsa.txt", false),
+			  new RegexTest("all_emails.csv", false),
 			  new RegexTest("../hidden.txt", false),
 			  new RegexTest("subdir/document.txt", false),
 			  new RegexTest("/etc/shadow", false),
@@ -49,8 +52,12 @@ public class Tests {
 	@TestFactory
 	Stream<DynamicTest> testCorrectFilenames() {
 		return Arrays.stream(filenames).map(entry -> {
+			String path = System.getProperty("user.dir");
 			return dynamicTest(entry.str + " is " + (entry.valid ? "Valid": "Invalid"), () -> {
-				assertEquals(FileValidator.fileNameIsValid(entry.str), entry.valid);
+				Path filepath = Paths.get(path, entry.str);
+				FileValidationResult res = FileValidator.fileNameIsValid(filepath);
+				System.out.println(res.msg);
+				assertEquals(res.okay, entry.valid);
 			});
 		});
 	}
