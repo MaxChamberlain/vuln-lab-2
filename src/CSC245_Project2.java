@@ -55,24 +55,24 @@ public class CSC245_Project2 {
         // Loop through email addresses and check if they are valid
         try (BufferedReader inputStream = new BufferedReader(new FileReader(normalizedFilename))) {   // try-with-resources
             System.out.println("Email Addresses:");
-            String content = "";
+            StringBuilder content = new StringBuilder();
             while ((fileLine = inputStream.readLine()) != null) {
                 try{
                     //normalize file line to prevent unicode attacks
                     String normalizedFileLine = Normalizer.normalize(fileLine, Form.NFKC);
                     if (ValidateEmail.emailIsValid(normalizedFileLine)) {
                         System.out.println(normalizedFileLine);
-                        content += HTMLEntityEncode(normalizedFileLine) + ",";
+                        content.append(HTMLEntityEncode(normalizedFileLine)).append(",");
                     } else {
                         System.out.println("Invalid Email Address: " + normalizedFileLine);
-                        content += "Invalid Email Address: " + HTMLEntityEncode(normalizedFileLine) + ",";
+                        content.append("Invalid Email Address: ").append(HTMLEntityEncode(normalizedFileLine)).append(",");
                     }
                 } catch(IllegalArgumentException e){
                     System.out.println(e);
                 }
             }
-            content = content.substring(0, content.length() - 2);
-            createHTMLFile(normalizedFilename, content);
+            content = new StringBuilder(content.substring(0, content.length() - 2));
+            createHTMLFile(normalizedFilename, content.toString());
         } catch (IOException io) {
             System.out.println("File IO exception: " + io.getMessage());
         }
@@ -80,14 +80,14 @@ public class CSC245_Project2 {
 
     private static void createHTMLFile(String filename, String content) {
         String htmlFilename = filename + ".html";
-        String html = "<html><head><title>" + filename + "</title></head><body>";
+        StringBuilder html = new StringBuilder("<html><head><title>" + filename + "</title></head><body>");
         for(String line : content.split(",")){
-            html += "<p>" + line + "</p>";
+            html.append("<p>").append(line).append("</p>");
         }
-        html += "</body></html>";
+        html.append("</body></html>");
         try {
             FileWriter myWriter = new FileWriter(htmlFilename);
-            myWriter.write(html);
+            myWriter.write(html.toString());
             myWriter.close();
             System.out.println("Successfully wrote to the html file.");
           } catch (IOException e) {
@@ -97,14 +97,14 @@ public class CSC245_Project2 {
     }
 
     private static String HTMLEntityEncode(String input) {
-        StringBuffer returnedString = new StringBuffer();
+        StringBuilder returnedString = new StringBuilder();
 
         for (int i = 0; i < input.length(); i++) {
             char currentCharacter = input.charAt(i);
             if (Character.isLetterOrDigit(currentCharacter) || Character.isWhitespace(currentCharacter)) {
                 returnedString.append(currentCharacter);
             } else {
-                returnedString.append("&#" + (int)currentCharacter + ";");
+                returnedString.append("&#").append((int) currentCharacter).append(";");
             }
         }
         return returnedString.toString();
