@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.Normalizer;
@@ -71,19 +72,25 @@ public class CSC245_Project2 {
             System.out.println("Email Addresses:");
             // Regex for email address
             Pattern emailRegex = Pattern.compile("^[a-zA-Z0-9_.+-]{3,}@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]{2,}$");
+            String content = "";
             while ((fileLine = inputStream.readLine()) != null) {
                 try{
                     //normalize file line to prevent unicode attacks
                     String normalizedFileLine = Normalizer.normalize(fileLine, Form.NFKC);
-                    if (emailRegex.matcher(normalizedFileLine).matches()) {
-                        System.out.println(normalizedFileLine);
+                    String encodedFileLine = HTMLEntityEncode(normalizedFileLine);
+                    if (emailRegex.matcher(encodedFileLine).matches()) {
+                        System.out.println(encodedFileLine);
+                        content += encodedFileLine + ",";
                     } else {
-                        throw new IllegalArgumentException("Invalid Email Address (" + normalizedFileLine + ")");
+                        System.out.println("Invalid Email Address: " + encodedFileLine);
+                        content += "Invalid Email Address: " + encodedFileLine + ",";
                     }
                 } catch(IllegalArgumentException e){
                     System.out.println(e);
                 }
             }
+            content = content.substring(0, content.length() - 2);
+            createHTMLFile(normalizedFilename, content);
         } catch (IOException io) {
             System.out.println("File IO exception: " + io.getMessage());
         }
@@ -95,4 +102,37 @@ public class CSC245_Project2 {
         long maxFileSize = 1000000; // 1 MB
         return fileSize > maxFileSize;
     }
+
+    private static void createHTMLFile(String filename, String content) {
+        String htmlFilename = filename + ".html";
+        String html = "<html><head><title>" + filename + "</title></head><body>";
+        for(String line : content.split(",")){
+            html += "<p>" + line + "</p>";
+        }
+        html += "</body></html>";
+        try {
+            FileWriter myWriter = new FileWriter(htmlFilename);
+            myWriter.write(html);
+            myWriter.close(); 
+            System.out.println("Successfully wrote to the html file.");
+          } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+          }
+    }
+    
+    private static String HTMLEntityEncode(String input) {
+        StringBuffer sb = new StringBuffer();
+    
+        for (int i = 0; i < input.length(); i++) {
+        char ch = input.charAt(i);
+        if (Character.isLetterOrDigit(ch) || Character.isWhitespace(ch)) {
+            sb.append(ch);
+        } else {
+            sb.append("&#" + (int)ch + ";");
+        }
+        }
+        return sb.toString();
+    }
+
 }
