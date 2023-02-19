@@ -68,8 +68,8 @@ public class CSC245_Project2 {
                         System.out.println("Invalid Email Address: " + normalizedFileLine);
                         content.add(new TableRow(normalizedFileLine, false));
                     }
-                } catch(IllegalArgumentException e){
-                    System.out.println(e);
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
                 }
             }
             createHTMLFile(normalizedFilename, content);
