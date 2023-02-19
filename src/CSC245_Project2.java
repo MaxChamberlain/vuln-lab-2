@@ -41,7 +41,7 @@ public class CSC245_Project2 {
     public static void main(String[] args) throws IOException {
 
         // Check for filename
-        String filename = "./assets/Email_addresses_20210205.txt";// + args[0];
+        String filename = args[0];
         if (filename == null || filename.isEmpty()) throw new IllegalArgumentException("No filename");
 
         String canonicalFilename = new File(filename).getCanonicalPath();
