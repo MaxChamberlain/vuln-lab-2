@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+import java.util.ArrayList;
 
 public class CSC245_Project2 {
 
@@ -55,34 +56,33 @@ public class CSC245_Project2 {
         // Loop through email addresses and check if they are valid
         try (BufferedReader inputStream = new BufferedReader(new FileReader(normalizedFilename))) {   // try-with-resources
             System.out.println("Email Addresses:");
-            StringBuilder content = new StringBuilder();
+            ArrayList<TableRow> content = new ArrayList<>();
             while ((fileLine = inputStream.readLine()) != null) {
                 try{
                     //normalize file line to prevent unicode attacks
                     String normalizedFileLine = Normalizer.normalize(fileLine, Form.NFKC);
                     if (ValidateEmail.emailIsValid(normalizedFileLine)) {
                         System.out.println(normalizedFileLine);
-                        content.append(HTMLEntityEncode(normalizedFileLine)).append(",");
+                        content.add(new TableRow(normalizedFileLine, true));
                     } else {
                         System.out.println("Invalid Email Address: " + normalizedFileLine);
-                        content.append("Invalid Email Address: ").append(HTMLEntityEncode(normalizedFileLine)).append(",");
+                        content.add(new TableRow(normalizedFileLine, false));
                     }
                 } catch(IllegalArgumentException e){
                     System.out.println(e);
                 }
             }
-            content = new StringBuilder(content.substring(0, content.length() - 2));
-            createHTMLFile(normalizedFilename, content.toString());
+            createHTMLFile(normalizedFilename, content);
         } catch (IOException io) {
             System.out.println("File IO exception: " + io.getMessage());
         }
     }
 
-    private static void createHTMLFile(String filename, String content) {
+    private static void createHTMLFile(String filename, ArrayList<TableRow> content) {
         String htmlFilename = filename + ".html";
-        StringBuilder html = new StringBuilder("<html><head><title>" + filename + "</title></head><body>");
-        for(String line : content.split(",")){
-            html.append("<p>").append(line).append("</p>");
+        StringBuilder html = new StringBuilder("<html><head><title>" + filename + "</title></head><body><table><tr><th>Email</th><th>Validity</th></tr>");
+        for(TableRow line : content){
+            html.append("<tr><td>").append(HTMLEntityEncode(line.email)).append("</td><td>").append(line.valid ? "Valid" : "Invalid").append("</tr>");
         }
         html.append("</body></html>");
         try {
@@ -110,4 +110,13 @@ public class CSC245_Project2 {
         return returnedString.toString();
     }
 
+}
+
+class TableRow {
+    String email;
+    boolean valid;
+    public TableRow(String email, boolean valid) {
+        this.email = email;
+        this.valid = valid;
+    }
 }
