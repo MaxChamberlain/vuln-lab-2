@@ -77,13 +77,12 @@ public class CSC245_Project2 {
                 try{
                     //normalize file line to prevent unicode attacks
                     String normalizedFileLine = Normalizer.normalize(fileLine, Form.NFKC);
-                    String encodedFileLine = HTMLEntityEncode(normalizedFileLine);
-                    if (emailRegex.matcher(encodedFileLine).matches()) {
-                        System.out.println(encodedFileLine);
-                        content += encodedFileLine + ",";
+                    if (emailRegex.matcher(normalizedFileLine).matches()) {
+                        System.out.println(normalizedFileLine);
+                        content += HTMLEntityEncode(normalizedFileLine) + ",";
                     } else {
-                        System.out.println("Invalid Email Address: " + encodedFileLine);
-                        content += "Invalid Email Address: " + encodedFileLine + ",";
+                        System.out.println("Invalid Email Address: " + normalizedFileLine);
+                        content += "Invalid Email Address: " + HTMLEntityEncode(normalizedFileLine) + ",";
                     }
                 } catch(IllegalArgumentException e){
                     System.out.println(e);
@@ -122,17 +121,17 @@ public class CSC245_Project2 {
     }
     
     private static String HTMLEntityEncode(String input) {
-        StringBuffer sb = new StringBuffer();
-    
+        StringBuffer returnedString = new StringBuffer();
+
         for (int i = 0; i < input.length(); i++) {
-        char ch = input.charAt(i);
-        if (Character.isLetterOrDigit(ch) || Character.isWhitespace(ch)) {
-            sb.append(ch);
-        } else {
-            sb.append("&#" + (int)ch + ";");
+            char currentCharacter = input.charAt(i);
+            if (Character.isLetterOrDigit(currentCharacter) || Character.isWhitespace(currentCharacter)) {
+                returnedString.append(currentCharacter);
+            } else {
+                returnedString.append("&#" + (int)currentCharacter + ";");
+            }
         }
-        }
-        return sb.toString();
+        return returnedString.toString();
     }
 
 }
