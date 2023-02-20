@@ -55,7 +55,7 @@ public class FileValidator {
 	 * @return A String array containing the result of the validation
 	 */
 	public static String[] filenameConvention(String filename) throws IllegalArgumentException {
-		Pattern invalidCharPattern = Pattern.compile("^-.*|.*<script>.*|.*[\\n\\r\\x1b].*");
+		Pattern invalidCharPattern = Pattern.compile("^-.*|.*<script>.*|.*</script>.*|.*[\\n\\r\\x1b].*");
 		if (invalidCharPattern.matcher(filename).matches())
 			return new String[] { "false", "Invalid characters" };
 		if (filename.matches(".*\\s.*")) {
