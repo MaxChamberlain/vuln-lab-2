@@ -5,7 +5,7 @@
    Patched by getting canonical name of file before validation
 
 ## Normalize Strings before validating them (IDS01-J)  (AJ)
-  ### Patched by introducing a NFKC Normalizer
+   Patched by introducing a NFKC Normalizer
 
 
 ## Sanitize Untrusted Data included in a regular expression (IDS08-J)  (Max, Ronan)
