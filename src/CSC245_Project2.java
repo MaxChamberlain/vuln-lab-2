@@ -1,3 +1,25 @@
+/*   Max, Jason, AJ, Nathan, Austin and Ronan - CSC245 Project 2
+
+ *   This program reads a file of email addresses and checks if they are valid
+ *   It then writes the valid email addresses to a new html file which shows the email addresses in a table
+ *   The program also checks if the file is too large, if the filename is valid, and if the filename contains invalid naming conventions
+ *   The program also prevents path traversal attacks and unicode attacks
+ *   The program also prevents buffer overflow attacks
+ *   The program also prevents resource exhaustion attacks
+ *   The program also prevents regular expression attacks
+ *   The program also prevents JavaScript injection attacks
+ *   The program also prevents cross-site scripting attacks
+
+ *   Covering the following known vulnerabilities:
+ *   IDS01-J - Prevent Unicode Attacks
+ *   IDS08-J - Sanitize Untrusted Data included in a regular expression
+ *   IDS50-J - Use Conservative File Naming conventions
+ *   IDS51-J - Properly encode or escape output
+ *   FIO16-J - Canonicalize Path Names before validating them
+ *   ERROR01-J - Do not suppress or ignore checked exceptions (IOException)
+ */
+
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -14,13 +36,22 @@ public class CSC245_Project2 {
 
         // Check for filename
         String filename = args[0];
+        // Check if filename null or empty
         if (filename == null || filename.isEmpty()) throw new IllegalArgumentException("No filename");
-        //Normalize the filename to prevent unicode attacks
+
+        /* Normalize Strings before validating them (IDS01-J) - AJ
+         * This prevents unicode attacks
+         */
+        /* Canonicalize Path Names before validating them (FIO16-J) - Max, Jason
+         * This prevents path traversal attacks (e.g. ../../etc/passwd)
+         */
         String normalizedFilename = Normalizer.normalize(new File(filename).getCanonicalPath(), Normalizer.Form.NFKC);
+        //Check if filename contains invalid naming conventions
         if(FileValidator.filenameConvention(filename.toString())[0].equals("false")){
             System.err.println(FileValidator.filenameConvention(filename.toString())[1]);
             return;
         }
+        //Check if filename is valid
         FileValidationResult res = FileValidator.fileNameIsValid(Path.of(normalizedFilename));
         if (!res.okay) {
             System.err.println(res.msg);
@@ -54,6 +85,12 @@ public class CSC245_Project2 {
         }
     }
 
+    /*
+     * Create HTML file with email addresses and validity
+     * @param filename The name of the file to be created
+     * @param content The content of the file
+     * @implNote This displays the email addresses in a table with the valid email addresses in green and the invalid email addresses in red
+     */
     private static void createHTMLFile(String filename, ArrayList<TableRow> content) {
         String CSS_VAR = """
             <style>
@@ -103,6 +140,9 @@ public class CSC245_Project2 {
           }
     }
 
+    /* Properly Encode or escape output (IDS51-J) - Austin
+     * This prevents XSS attacks and script injection
+     */
     private static String HTMLEntityEncode(String input) {
         StringBuilder returnedString = new StringBuilder();
 
@@ -119,6 +159,9 @@ public class CSC245_Project2 {
 
 }
 
+/*
+ * Class to hold email address and validity
+ */
 class TableRow {
     String email;
     boolean valid;
