@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 public class FileValidator {
-	private static final Pattern filenameRegex = Pattern.compile("^[a-zA-Z0-9\\/_\\-.:]+\\.txt$");
+	private static final Pattern filenameRegex = Pattern.compile("^[a-zA-Z0-9\\\\/_\\-.:]+\\.txt$");
 	public static FileValidationResult fileNameIsValid(Path filename) {
 		filename = filename.normalize();
 		if(!filename.toString().endsWith(".txt"))

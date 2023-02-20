@@ -79,12 +79,31 @@ public class CSC245_Project2 {
     }
 
     private static void createHTMLFile(String filename, ArrayList<TableRow> content) {
+        String CSS_VAR = """
+            <style>
+                table {
+                    font-family: arial, sans-serif;
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+                
+                td, th {
+                    border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;
+                }
+                
+                tr:nth-child(even) {
+                    background-color: #dddddd;
+                }
+            </style>
+        """;
         String htmlFilename = filename + ".html";
-        StringBuilder html = new StringBuilder("<html><head><title>" + filename + "</title></head><body><table><tr><th>Email</th><th>Validity</th></tr>");
+        StringBuilder html = new StringBuilder("<html><head>" + CSS_VAR + "<title>" + filename + "</title></head><body><table><thead><tr><th>Email</th><th>Validity</th></tr></thead><tbody>");
         for(TableRow line : content){
-            html.append("<tr><td>").append(HTMLEntityEncode(line.email)).append("</td><td>").append(line.valid ? "Valid" : "Invalid").append("</tr>");
+            html.append("<tr style=\"" + (line.valid ? "background-color: hsl(90, 80%, 70%)" : "background-color: hsl(0, 80%, 80%)") + "\"><td>").append(HTMLEntityEncode(line.email)).append("</td><td>").append(line.valid ? "Valid" : "Invalid").append("</tr>");
         }
-        html.append("</body></html>");
+        html.append("</tbody></table></body></html>");
         try {
             FileWriter myWriter = new FileWriter(htmlFilename);
             myWriter.write(html.toString());
