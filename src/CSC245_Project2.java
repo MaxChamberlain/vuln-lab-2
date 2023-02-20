@@ -10,33 +10,6 @@ import java.util.ArrayList;
 
 public class CSC245_Project2 {
 
-    /*  DISCOVERED VULNERABILITIES
-     * 1. Does not check email address for script tags
-     *      solved with regex validation
-     *
-     * 2. Does not check email address for unescaped "illegal" characters
-     *      ( # ! = @ % $ . )
-     *          solved with regex validation
-     *
-     * 3. Does not check validity of domain carrier
-     *      (.com => .comnfg)
-     *          solved with regex validation
-     *
-     * 4. Does not check validity of domain host
-     *      (@arapahoe.edu => @..edu)
-     *          solved with regex validation
-     *
-     * 5. Does not check length of Email name
-     *      (ed@...)
-     *          solved with regex validation
-     *
-     * 6. Filename is never checked for validity (null, empty, traversal, etc.)
-     *          solved with regex to check filename validity
-     *
-     * 7. Input stream is never closed if there is an error (memory leak)
-     *          solved by using try-with-resources instead of try-catch-finally
-     */
-
     public static void main(String[] args) throws IOException {
 
         // Check for filename
@@ -44,7 +17,10 @@ public class CSC245_Project2 {
         if (filename == null || filename.isEmpty()) throw new IllegalArgumentException("No filename");
         //Normalize the filename to prevent unicode attacks
         String normalizedFilename = Normalizer.normalize(new File(filename).getCanonicalPath(), Normalizer.Form.NFKC);
-
+        if(FileValidator.filenameConvention(filename.toString())[0].equals("false")){
+            System.err.println(FileValidator.filenameConvention(filename.toString())[1]);
+            return;
+        }
         FileValidationResult res = FileValidator.fileNameIsValid(Path.of(normalizedFilename));
         if (!res.okay) {
             System.err.println(res.msg);
@@ -81,27 +57,39 @@ public class CSC245_Project2 {
     private static void createHTMLFile(String filename, ArrayList<TableRow> content) {
         String CSS_VAR = """
             <style>
+                body{
+                    background-color: hsl(240, 0%, 90%);
+                    font-family: arial, sans-serif;
+                    padding: 1rem;
+                }
                 table {
                     font-family: arial, sans-serif;
                     border-collapse: collapse;
                     width: 100%;
+                    border-radius: 5px;
+                    padding: 1rem;
+                    background-color: white;
                 }
                 
                 td, th {
                     border: 1px solid #dddddd;
                     text-align: left;
-                    padding: 8px;
+                    padding: 0.5rem;
                 }
                 
                 tr:nth-child(even) {
                     background-color: #dddddd;
+                }
+                
+                tr{
+                    padding: 0.5rem;
                 }
             </style>
         """;
         String htmlFilename = filename + ".html";
         StringBuilder html = new StringBuilder("<html><head>" + CSS_VAR + "<title>" + filename + "</title></head><body><table><thead><tr><th>Email</th><th>Validity</th></tr></thead><tbody>");
         for(TableRow line : content){
-            html.append("<tr style=\"" + (line.valid ? "background-color: hsl(90, 80%, 70%)" : "background-color: hsl(0, 80%, 80%)") + "\"><td>").append(HTMLEntityEncode(line.email)).append("</td><td>").append(line.valid ? "Valid" : "Invalid").append("</tr>");
+            html.append("<tr style=\"" + (line.valid ? "background-color: hsl(90, 80%, 80%)" : "background-color: hsl(0, 80%, 80%)") + "\"><td>").append(HTMLEntityEncode(line.email)).append("</td><td>").append(line.valid ? "Valid" : "Invalid").append("</tr>");
         }
         html.append("</tbody></table></body></html>");
         try {

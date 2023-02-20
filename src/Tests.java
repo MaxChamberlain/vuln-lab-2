@@ -36,6 +36,7 @@ public class Tests {
 		});
 	}
 	RegexTest[] filenames = new RegexTest[] {
+			  new RegexTest("assets/Email addresses 20210205.txt", false),
 			  new RegexTest("assets/Email_addresses_20210205.txt", true),
 			  new RegexTest("assets/localemails.txt", true),
 			  new RegexTest("assets/../../.ssh/id_rsa.txt", false),
@@ -56,7 +57,7 @@ public class Tests {
 			return dynamicTest(entry.str + " is " + (entry.valid ? "Valid": "Invalid"), () -> {
 				Path filepath = Paths.get(path, entry.str);
 				FileValidationResult res = FileValidator.fileNameIsValid(filepath);
-				System.out.println(res.msg);
+				System.out.println(res.msg + ": " + filepath.toString());
 				assertEquals(res.okay, entry.valid);
 			});
 		});
