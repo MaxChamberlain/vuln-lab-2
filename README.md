@@ -1,3 +1,11 @@
+# Vuln Lab 2
+![](https://img.shields.io/tokei/lines/github/MaxChamberlain/vuln-lab-2)
+![](https://img.shields.io/github/downloads/MaxChamberlain/vuln-lab-2/total)
+![](https://img.shields.io/github/issues/MaxChamberlain/vuln-lab-2)
+![](https://img.shields.io/github/last-commit/MaxChamberlain/vuln-lab-2)
+![](https://img.shields.io/badge/JDK-temurin--17-brightgreen)
+![](https://img.shields.io/badge/license-AAAAAA-critical)
+
 ## Do Not Allow Exceptions To Expose sensitive information (ERROR01-J)
    Patched by using specified print messages
 
